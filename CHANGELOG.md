@@ -8,7 +8,7 @@
 
 ## 1.0.1 (2026-06-05)
 
-- docs: Add live Open VSX Registry link (https://open-vsx.org/extension/veprompts/1-click-mcp-installer)
+- docs: Add live Open VSX Registry link (https://open-vsx.org/extension/Veduis/1-click-mcp-installer)
 - docs: Add Veduis blog launch announcement backlink to README
 
 ## 1.0.0 (2026-06-05)
