@@ -46,7 +46,7 @@ Select your target MCP client and enter required environment variables. The serv
 ## Installation
 
 1. Install from the VS Code Marketplace (coming soon)
-2. Or install manually from the [Open VSX Registry](https://open-vsx.org) (coming soon)
+2. Or install from the [Open VSX Registry](https://open-vsx.org/extension/veprompts/1-click-mcp-installer)
 3. Open the MCP Installer panel from the activity bar
 4. Browse categories or search for servers
 5. Click install on any server
