@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { ClientConfig, readConfig } from './reader';
+import { ClientConfig } from '../types/server';
+import { readConfig } from './reader';
 
 export function writeConfig(configPath: string, config: ClientConfig, format: string): void {
   const dir = path.dirname(configPath);
@@ -35,9 +36,10 @@ export function writeConfig(configPath: string, config: ClientConfig, format: st
       // Zed uses mcp_servers key
       const zedServers: Record<string, { command: string; args?: string[] }> = {};
       for (const [key, value] of Object.entries(merged.mcpServers)) {
+        const v = value as { command: string; args?: string[] };
         zedServers[key] = {
-          command: value.command,
-          args: value.args
+          command: v.command,
+          args: v.args
         };
       }
       output = { mcp_servers: zedServers };

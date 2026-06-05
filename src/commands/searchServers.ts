@@ -18,12 +18,13 @@ export async function fetchServers(context: vscode.ExtensionContext): Promise<Mc
   );
 
   try {
-    const response = await fetch(catalogUrl);
+    const response = await (globalThis as any).fetch(catalogUrl);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    const data = await response.json();
-    cachedServers = Array.isArray(data) ? data : data.servers || [];
+    const data = await response.json() as Record<string, unknown> | unknown[];
+    const servers = Array.isArray(data) ? data : (data.servers as McpServer[]) || [];
+    cachedServers = servers as McpServer[];
     lastFetch = now;
     return cachedServers;
   } catch (err) {

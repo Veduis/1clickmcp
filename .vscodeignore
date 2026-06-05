@@ -1,0 +1,15 @@
+# Source files (compiled to out/)
+src/
+tsconfig.json
+
+# Development
+node_modules/
+.git/
+.gitignore
+
+# Build artifacts
+*.vsix
+
+# OS files
+.DS_Store
+Thumbs.db
