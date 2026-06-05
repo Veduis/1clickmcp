@@ -15,8 +15,9 @@ export class ServerTreeItem extends vscode.TreeItem {
     super(label, collapsibleState);
 
     if (server) {
-      this.tooltip = `${server.title}\n${server.description}\n⭐ ${server.stars.toLocaleString()} stars | ${server.language} | ${server.license}`;
-      this.description = `⭐ ${server.stars.toLocaleString()}`;
+      const stars = server.stars || 0;
+      this.tooltip = `${server.title || server.name}\n${server.description}\n⭐ ${stars.toLocaleString()} stars | ${server.language || 'TypeScript'} | ${server.license || 'MIT'}`;
+      this.description = `⭐ ${stars.toLocaleString()}`;
 
       // Make server items clickable — open detail panel inside VS Code
       this.command = {

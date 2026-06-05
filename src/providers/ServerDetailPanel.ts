@@ -113,6 +113,9 @@ export class ServerDetailPanel {
       `<div class="method"><code>${e(m.command)}</code><span>${e(m.description)}</span></div>`
     ).join('');
 
+    // Ensure vepromptsUrl is valid
+    const docsUrl = s.vepromptsUrl || `https://veprompts.com/mcp/servers/${s.id}/`;
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,6 +148,8 @@ export class ServerDetailPanel {
     .btn-danger { padding: 10px 20px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
     .btn-danger:hover { background: #b91c1c; }
     .one-click { display: inline-flex; align-items: center; gap: 6px; background: #166534; color: #86efac; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .docs-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 8px 16px; background: var(--vscode-button-secondaryBackground); border: 1px solid var(--vscode-panel-border); border-radius: 6px; color: var(--vscode-textLink-foreground); text-decoration: none; font-size: 13px; font-weight: 500; }
+    .docs-link:hover { background: var(--vscode-button-hoverBackground); }
   </style>
 </head>
 <body>
@@ -153,7 +158,7 @@ export class ServerDetailPanel {
     ${s.official ? '<span class="badge official">Official</span>' : ''}
     ${s.featured ? '<span class="badge featured">Featured</span>' : ''}
     ${isInstalled ? '<span class="badge installed">✓ Installed</span>' : ''}
-    ⭐ ${s.stars.toLocaleString()} | ${e(s.language)} | ${e(s.license)} | By <a href="#" onclick="openExternal('${e(s.authorUrl || s.repoUrl)}')">${e(s.author)}</a>
+    ⭐ ${(s.stars || 0).toLocaleString()} | ${e(s.language || 'TypeScript')} | ${e(s.license || 'MIT')} | By <a href="#" onclick="openExternal('${e(s.authorUrl || s.repoUrl || s.githubUrl)}')">${e(s.author || 'Unknown')}</a>
     ${s.envVars.length === 0 ? '<span class="one-click">⚡ 1-Click Install</span>' : ''}
   </div>
 
@@ -166,6 +171,8 @@ export class ServerDetailPanel {
     }
     <button class="btn-secondary" id="copyBtn">📋 Copy Config</button>
   </div>
+
+  <a href="#" class="docs-link" onclick="openExternal('${e(docsUrl)}')">📖 View Full Documentation on VePrompts</a>
 
   <div class="section">
     <h2>Install Methods</h2>
@@ -196,7 +203,6 @@ export class ServerDetailPanel {
   </div>
 
   <div class="footer">
-    <p>📖 <a href="#" onclick="openExternal('${e(s.vepromptsUrl)}')">View full documentation on VePrompts</a></p>
     <p style="font-size: 12px; color: var(--vscode-descriptionForeground);">
       Powered by <a href="#" onclick="openExternal('https://veprompts.com')">VePrompts</a> — The #1 free MCP server directory
     </p>

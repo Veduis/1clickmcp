@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 (2026-06-05)
+
+- feat: Add `normalizeServer()` to handle both old sparse API format and new enriched format
+- feat: Extension now works regardless of whether API returns basic or full server data
+- feat: Prominent "View Full Documentation on VePrompts" button in server detail panel
+- fix: Webview safely handles missing fields (stars, language, license, author) with defaults
+- fix: `vepromptsUrl` fallback to constructed URL if missing from API response
+- fix: `envVars` derived from `env` object when new format not available
+- fix: `installMethods`, `tools`, `compatibility`, `rating` all have sensible defaults
+
 ## 1.0.9 (2026-06-05)
 
 - fix: Update McpServer type to match enriched API with stars, title, category, vepromptsUrl
