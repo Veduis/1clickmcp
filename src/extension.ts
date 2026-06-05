@@ -6,6 +6,7 @@ import { uninstallServer } from './commands/uninstallServer';
 import { searchServers } from './commands/searchServers';
 import { copyInstallCommand } from './commands/copyInstallCommand';
 import { openOnVePrompts, openVeduis } from './commands/openOnVePrompts';
+import { configureServerEnv } from './commands/configureServerEnv';
 
 export function activate(context: vscode.ExtensionContext): void {
   const treeProvider = new ServerTreeProvider(context);
@@ -82,6 +83,15 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('veprompts-mcp.openVeduis', () => {
       openVeduis();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('veprompts-mcp.configureServerEnv', async (item: ServerTreeItem) => {
+      if (item.server && item.client) {
+        await configureServerEnv(context, item.server, item.client);
+        treeProvider.refresh();
+      }
     })
   );
 

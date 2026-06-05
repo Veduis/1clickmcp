@@ -2,7 +2,7 @@
   "name": "1-click-mcp-installer",
   "displayName": "1 Click MCP Installer By VePrompts",
   "description": "Install MCP servers from VePrompts directory with one click. Supports Claude Desktop, Cursor, Cline, Devin (formerly Windsurf), VS Code, Continue.dev, Zed, and more.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "veduis",
   "author": "Veduis (https://veduis.com)",
   "icon": "icon.png",
@@ -71,6 +71,12 @@
         "command": "veprompts-mcp.openOnVePrompts",
         "title": "Open on VePrompts",
         "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.configureServerEnv",
+        "title": "Configure Environment Variables",
+        "category": "VePrompts",
+        "icon": "$(gear)"
       }
     ],
     "viewsContainers": {
@@ -102,6 +108,16 @@
           "command": "veprompts-mcp.uninstallServer",
           "when": "view == veprompts-mcp.servers && viewItem == installed",
           "group": "inline"
+        },
+        {
+          "command": "veprompts-mcp.configureServerEnv",
+          "when": "view == veprompts-mcp.servers && viewItem == installed-needs-config",
+          "group": "inline@1"
+        },
+        {
+          "command": "veprompts-mcp.uninstallServer",
+          "when": "view == veprompts-mcp.servers && viewItem == installed-needs-config",
+          "group": "inline@2"
         }
       ]
     },
@@ -127,9 +143,10 @@
             "Auto-detect from installed clients",
             "Claude Desktop",
             "Cursor",
-            "Cline (VS Code extension)",
+            "Cline (VS Code: extension)",
             "Devin (formerly Windsurf)",
-            "VS Code (native MCP)",
+            "Devin (formerly Windsurf) — alias",
+            "VS Code: (native MCP)",
             "Continue.dev",
             "Zed",
             "mcphub.nvim (Neovim)"

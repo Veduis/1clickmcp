@@ -19,7 +19,7 @@ export class ServerTreeItem extends vscode.TreeItem {
       this.tooltip = `${server.title || server.name}\n${server.description}\n⭐ ${stars.toLocaleString()} stars | ${server.language || 'TypeScript'} | ${server.license || 'MIT'}`;
       this.description = `⭐ ${stars.toLocaleString()}`;
 
-      // Make server items clickable — open detail panel inside VS Code
+      // Make server items clickable — open detail panel inside VS Code:
       this.command = {
         command: 'veprompts-mcp.openServerDetail',
         title: 'Open Server Details',
@@ -32,10 +32,22 @@ export class ServerTreeItem extends vscode.TreeItem {
 
       if (client) {
         const config = readConfig(client.configPath, client.configFormat);
-        const isInstalled = !!config.mcpServers[server.id];
-        this.contextValue = isInstalled ? 'installed' : 'server';
+        const serverConfig = config.mcpServers[server.id];
+        const isInstalled = !!serverConfig;
+        const hasEmptyEnv = isInstalled && server.envVars && server.envVars.length > 0 &&
+          (!serverConfig.env || Object.values(serverConfig.env).some(v => !v || v === ''));
+
+        this.contextValue = isInstalled ? (hasEmptyEnv ? 'installed-needs-config' : 'installed') : 'server';
+
         if (isInstalled) {
-          this.iconPath = new vscode.ThemeIcon('check');
+          if (hasEmptyEnv) {
+            // Show warning icon for installed servers missing env vars
+            this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('editorWarning.foreground'));
+            this.tooltip += '\n⚠️ Environment variables need configuration';
+            this.description = `⭐ ${stars.toLocaleString()} ⚠️ needs config`;
+          } else {
+            this.iconPath = new vscode.ThemeIcon('check');
+          }
         }
       } else {
         this.contextValue = 'server';

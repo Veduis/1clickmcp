@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 (2026-06-05)
+
+- feat: **Deferred environment variable configuration** — servers install immediately without blocking on env var prompts. Users configure env vars later via right-click "Configure Environment Variables"
+- feat: **Visual indicator for unconfigured servers** — installed servers with empty env vars show ⚠️ warning icon and "needs config" label in tree view
+- feat: **Always show client selection** — even with only 1 detected client, user explicitly chooses where to install (no more silent auto-install)
+- feat: **Custom path installation** — "Custom path..." option in client picker for edge cases (unusual config locations, new clients)
+- feat: **Configure env vars command** — new `veprompts-mcp.configureServerEnv` command accessible from context menu on servers needing configuration
+- feat: **Preferred client pre-selection** — if `veprompts-mcp.preferredClient` is set, that client is highlighted in the picker
+- fix: Install flow no longer interrupts user with multiple input boxes — one click, server is installed
+
 ## 1.1.0 (2026-06-05)
 
 - feat: Add `normalizeServer()` to handle both old sparse API format and new enriched format
