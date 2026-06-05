@@ -2,7 +2,7 @@
   "name": "1-click-mcp-installer",
   "displayName": "1 Click MCP Installer By VePrompts",
   "description": "Install MCP servers from VePrompts directory with one click. Supports Claude Desktop, Cursor, Cline, Devin (formerly Windsurf), VS Code, Continue.dev, Zed, and more.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "veduis",
   "author": "Veduis (https://veduis.com)",
   "icon": "icon.png",
@@ -77,6 +77,18 @@
         "title": "Configure Environment Variables",
         "category": "VePrompts",
         "icon": "$(gear)"
+      },
+      {
+        "command": "veprompts-mcp.searchInSidebar",
+        "title": "Search Servers",
+        "category": "VePrompts",
+        "icon": "$(search)"
+      },
+      {
+        "command": "veprompts-mcp.clearSidebarSearch",
+        "title": "Clear Search",
+        "category": "VePrompts",
+        "icon": "$(clear-all)"
       }
     ],
     "viewsContainers": {
@@ -98,6 +110,23 @@
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "veprompts-mcp.searchInSidebar",
+          "when": "view == veprompts-mcp.servers",
+          "group": "navigation@1"
+        },
+        {
+          "command": "veprompts-mcp.clearSidebarSearch",
+          "when": "view == veprompts-mcp.servers",
+          "group": "navigation@2"
+        },
+        {
+          "command": "veprompts-mcp.refresh",
+          "when": "view == veprompts-mcp.servers",
+          "group": "navigation@3"
+        }
+      ],
       "view/item/context": [
         {
           "command": "veprompts-mcp.installServer",

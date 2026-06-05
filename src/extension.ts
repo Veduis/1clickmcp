@@ -7,6 +7,7 @@ import { searchServers } from './commands/searchServers';
 import { copyInstallCommand } from './commands/copyInstallCommand';
 import { openOnVePrompts, openVeduis } from './commands/openOnVePrompts';
 import { configureServerEnv } from './commands/configureServerEnv';
+import { filterServers } from './commands/filterServers';
 
 export function activate(context: vscode.ExtensionContext): void {
   const treeProvider = new ServerTreeProvider(context);
@@ -98,6 +99,39 @@ export function activate(context: vscode.ExtensionContext): void {
         await configureServerEnv(context, item.server, item.client);
         treeProvider.refresh();
       }
+    })
+  );
+
+  // ── SIDEBAR SEARCH ────────────────────────────────────────────────
+  context.subscriptions.push(
+    vscode.commands.registerCommand('veprompts-mcp.searchInSidebar', async () => {
+      const query = await vscode.window.showInputBox({
+        placeHolder: 'Search servers by name, category, tag, or author...',
+        prompt: 'Type to filter the MCP server catalog',
+        ignoreFocusOut: true
+      });
+
+      if (query === undefined) {
+        return; // User cancelled
+      }
+
+      if (query.trim() === '') {
+        treeProvider.clearSearch();
+        return;
+      }
+
+      const results = await filterServers(context, query);
+      treeProvider.setSearch(query, results);
+
+      if (results.length === 0) {
+        vscode.window.showInformationMessage(`No servers found for "${query}"`);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('veprompts-mcp.clearSidebarSearch', () => {
+      treeProvider.clearSearch();
     })
   );
 

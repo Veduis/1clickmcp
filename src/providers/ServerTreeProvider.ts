@@ -69,9 +69,25 @@ export class CategoryTreeItem extends vscode.TreeItem {
   }
 }
 
+export class SearchResultTreeItem extends vscode.TreeItem {
+  constructor(
+    public readonly query: string,
+    public readonly servers: McpServer[],
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState
+  ) {
+    super(`Search: "${query}"`, collapsibleState);
+    this.description = `${servers.length} result${servers.length !== 1 ? 's' : ''}`;
+    this.contextValue = 'search-results';
+    this.iconPath = new vscode.ThemeIcon('search');
+  }
+}
+
 export class ServerTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | null | void> = new vscode.EventEmitter<vscode.TreeItem | undefined | null | void>();
   readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+
+  private _searchQuery: string | null = null;
+  private _searchResults: McpServer[] = [];
 
   constructor(private context: vscode.ExtensionContext) {}
 
@@ -79,11 +95,44 @@ export class ServerTreeProvider implements vscode.TreeDataProvider<vscode.TreeIt
     this._onDidChangeTreeData.fire();
   }
 
+  setSearch(query: string | null, results: McpServer[]): void {
+    this._searchQuery = query;
+    this._searchResults = results;
+    this.refresh();
+  }
+
+  clearSearch(): void {
+    this._searchQuery = null;
+    this._searchResults = [];
+    this.refresh();
+  }
+
   getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
   async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
+    // If there's an active search, show search results
+    if (!element && this._searchQuery) {
+      if (this._searchResults.length === 0) {
+        const emptyItem = new vscode.TreeItem('No servers found');
+        emptyItem.description = `Try a different search term`;
+        emptyItem.iconPath = new vscode.ThemeIcon('search-stop');
+        return [emptyItem];
+      }
+
+      const clients = detectClients();
+      const primaryClient = clients.find(c => c.exists);
+
+      return this._searchResults.map(s => new ServerTreeItem(
+        s.title || s.name,
+        vscode.TreeItemCollapsibleState.None,
+        s,
+        primaryClient,
+        'server'
+      ));
+    }
+
     if (!element) {
       // Root level: show categories
       const servers = await fetchServers(this.context);

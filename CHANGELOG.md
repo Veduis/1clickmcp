@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0 (2026-06-05)
+
+- feat: **Sidebar search** — search icon in the tree view title bar lets users filter servers by name, category, tag, or author. Results appear directly in the sidebar
+- feat: **Clear search** — dedicated button to reset the sidebar back to category view
+- feat: **Search filters across all fields** — name, title, description, category, tags, author, language, license
+- feat: **Empty search state** — shows "No servers found" with helpful hint when query returns zero results
+- feat: **Refresh button in title bar** — moved from command palette to visible tree view action
+
 ## 1.3.0 (2026-06-05)
 
 - feat: **Redesigned server detail panel** — clean, modern UI with proper typography, restrained colors, and clear hierarchy. No more vibe-coded gradients and emojis
