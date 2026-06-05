@@ -2,6 +2,26 @@
 
 Install MCP servers from [VePrompts](https://veprompts.com) with one click inside VS Code.
 
+## Screenshots
+
+**Activity Bar Icon**
+
+![Activity Bar Icon](media/activity-bar-icon.png)
+
+The MCP Installer panel is accessible from the VS Code activity bar via the plug icon.
+
+**Server Tree View**
+
+![Server Tree View](media/server-tree-view.png)
+
+Browse MCP servers by category. Installed servers show a checkmark. Click any server to install.
+
+**Install Prompt**
+
+![Install Prompt](media/install-prompt.png)
+
+Select your target MCP client and enter required environment variables. The server is added to your client's config automatically.
+
 ## Supported Clients
 
 | Client | Platform | Config Path |
