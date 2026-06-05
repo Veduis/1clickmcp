@@ -14,7 +14,7 @@ export async function fetchServers(context: vscode.ExtensionContext): Promise<Mc
 
   const catalogUrl = vscode.workspace.getConfiguration('veprompts-mcp').get<string>(
     'catalogUrl',
-    'https://veprompts.com/api/mcp-catalog'
+    'https://veprompts.com/api/mcp-catalog.json'
   );
 
   try {

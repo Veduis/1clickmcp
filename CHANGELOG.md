@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5 (2026-06-05)
+
+- fix: Update catalog URL to `/api/mcp-catalog.json` for static file serving
+- fix: Generate static JSON catalog at build time (91 servers)
+- fix: Git commits now properly attributed to Veduis (not VePrompts)
+
 ## 1.0.4 (2026-06-05)
 
 - fix: Replace incorrect icon with proper VePrompts brand logo (128x128 PNG)
