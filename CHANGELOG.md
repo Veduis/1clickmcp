@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.7 (2026-06-05)
+
+- feat: Add ServerDetailPanel webview — clicking a server now opens a rich detail panel inside VS Code instead of an external browser tab
+- feat: Panel shows install/uninstall buttons, copy command, client compatibility, and GitHub link
+- feat: Real-time install status detection and UI updates
+- fix: Restore expected in-IDE server browsing experience
+
 ## 1.0.6 (2026-06-05)
 
 - fix: Update default catalogUrl in package.json to `/api/mcp-catalog.json`

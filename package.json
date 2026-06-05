@@ -2,7 +2,7 @@
   "name": "1-click-mcp-installer",
   "displayName": "1 Click MCP Installer By VePrompts",
   "description": "Install MCP servers from VePrompts directory with one click. Supports Claude Desktop, Cursor, Cline, Devin (formerly Windsurf), VS Code, Continue.dev, Zed, and more.",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "publisher": "veduis",
   "author": "Veduis (https://veduis.com)",
   "icon": "icon.png",

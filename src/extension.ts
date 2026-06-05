@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ServerTreeProvider, ServerTreeItem } from './providers/ServerTreeProvider';
+import { ServerDetailPanel } from './providers/ServerDetailPanel';
 import { installServer } from './commands/installServer';
 import { uninstallServer } from './commands/uninstallServer';
 import { searchServers } from './commands/searchServers';
@@ -69,6 +70,12 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('veprompts-mcp.openOnVePrompts', (item: ServerTreeItem) => {
       openOnVePrompts(item.server?.id);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('veprompts-mcp.openServerDetail', (server: import('./types/server').McpServer) => {
+      ServerDetailPanel.createOrShow(context.extensionUri, server);
     })
   );
 
