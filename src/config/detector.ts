@@ -76,6 +76,27 @@ export function detectClients(): DetectedClient[] {
     }
   }
 
+  // Roo Code (Cline fork)
+  const rooPaths: Record<string, string[]> = {
+    macos: [path.join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json')],
+    linux: [path.join(home, '.config', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json')],
+    windows: [path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json')]
+  };
+  for (const p of rooPaths[platform] || []) {
+    if (fs.existsSync(p)) {
+      clients.push({
+        id: 'roo-code',
+        name: 'roo-code',
+        displayName: 'Roo Code',
+        configPath: p,
+        exists: true,
+        platform,
+        configFormat: 'claude'
+      });
+      break;
+    }
+  }
+
   // Windsurf
   const windsurfPath = path.join(home, '.codeium', 'windsurf', 'mcp_config.json');
   if (fs.existsSync(windsurfPath)) {
@@ -186,6 +207,15 @@ export function getAllPossiblePaths(): string[] {
     paths.push(path.join(home, '.config', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json'));
   } else if (platform === 'windows') {
     paths.push(path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json'));
+  }
+
+  // Roo Code
+  if (platform === 'macos') {
+    paths.push(path.join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json'));
+  } else if (platform === 'linux') {
+    paths.push(path.join(home, '.config', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json'));
+  } else if (platform === 'windows') {
+    paths.push(path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json'));
   }
 
   // Windsurf
