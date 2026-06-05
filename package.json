@@ -9,10 +9,10 @@
   "homepage": "https://veprompts.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/veprompts/1-click-mcp-installer"
+    "url": "https://github.com/Veduis/1clickmcp"
   },
   "bugs": {
-    "url": "https://github.com/veprompts/1-click-mcp-installer/issues"
+    "url": "https://github.com/Veduis/1clickmcp/issues"
   },
   "keywords": [
     "mcp",
