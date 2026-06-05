@@ -1,6 +1,15 @@
 # Changelog
 
-## 1.0.7 (2026-06-05)
+## 1.0.9 (2026-06-05)
+
+- fix: Update McpServer type to match enriched API with stars, title, category, vepromptsUrl
+- fix: ServerTreeProvider shows ⭐ star counts and category server counts (e.g., "Productivity (6 servers)")
+- fix: ServerTreeProvider uses official/featured badges and proper icons
+- fix: ServerDetailPanel webview matches original screenshot design
+- fix: "View full documentation on VePrompts" link now uses correct vepromptsUrl field
+- fix: Fallback data matches new rich type format
+
+## 1.0.8 (2026-06-05)
 
 - feat: Add ServerDetailPanel webview — clicking a server now opens a rich detail panel inside VS Code instead of an external browser tab
 - feat: Panel shows install/uninstall buttons, copy command, client compatibility, and GitHub link

@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { McpServer, DetectedClient } from '../types/server';
 import { detectClients } from '../config/detector';
 import { readConfig } from '../config/reader';
@@ -16,8 +15,8 @@ export class ServerTreeItem extends vscode.TreeItem {
     super(label, collapsibleState);
 
     if (server) {
-      this.tooltip = `${server.name}\n${server.description}\nCommand: ${server.command} ${server.args?.join(' ') || ''}`;
-      this.description = server.categories.slice(0, 2).join(', ');
+      this.tooltip = `${server.title}\n${server.description}\n⭐ ${server.stars.toLocaleString()} stars | ${server.language} | ${server.license}`;
+      this.description = `⭐ ${server.stars.toLocaleString()}`;
 
       // Make server items clickable — open detail panel inside VS Code
       this.command = {
@@ -26,22 +25,40 @@ export class ServerTreeItem extends vscode.TreeItem {
         arguments: [this.server]
       };
 
+      this.iconPath = server.official
+        ? new vscode.ThemeIcon('verified', new vscode.ThemeColor('charts.green'))
+        : new vscode.ThemeIcon('package');
+
       if (client) {
         const config = readConfig(client.configPath, client.configFormat);
         const isInstalled = !!config.mcpServers[server.id];
-        this.iconPath = new vscode.ThemeIcon(isInstalled ? 'check' : 'circle-outline');
         this.contextValue = isInstalled ? 'installed' : 'server';
+        if (isInstalled) {
+          this.iconPath = new vscode.ThemeIcon('check');
+        }
       } else {
-        this.iconPath = new vscode.ThemeIcon('circle-outline');
         this.contextValue = 'server';
       }
     }
   }
 }
 
-export class ServerTreeProvider implements vscode.TreeDataProvider<ServerTreeItem> {
-  private _onDidChangeTreeData: vscode.EventEmitter<ServerTreeItem | undefined | null | void> = new vscode.EventEmitter<ServerTreeItem | undefined | null | void>();
-  readonly onDidChangeTreeData: vscode.Event<ServerTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+export class CategoryTreeItem extends vscode.TreeItem {
+  constructor(
+    public readonly category: string,
+    public readonly servers: McpServer[],
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState
+  ) {
+    super(category, collapsibleState);
+    this.description = `${servers.length} server${servers.length !== 1 ? 's' : ''}`;
+    this.contextValue = 'category';
+    this.iconPath = new vscode.ThemeIcon('folder');
+  }
+}
+
+export class ServerTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+  private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | null | void> = new vscode.EventEmitter<vscode.TreeItem | undefined | null | void>();
+  readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
   constructor(private context: vscode.ExtensionContext) {}
 
@@ -49,37 +66,43 @@ export class ServerTreeProvider implements vscode.TreeDataProvider<ServerTreeIte
     this._onDidChangeTreeData.fire();
   }
 
-  getTreeItem(element: ServerTreeItem): vscode.TreeItem {
+  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
     return element;
   }
 
-  async getChildren(element?: ServerTreeItem): Promise<ServerTreeItem[]> {
+  async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
     if (!element) {
       // Root level: show categories
       const servers = await fetchServers(this.context);
-      const categories = [...new Set(servers.flatMap(s => s.categories))].sort();
+      const categories = new Map<string, McpServer[]>();
 
-      return categories.map(cat => new ServerTreeItem(
-        cat,
-        vscode.TreeItemCollapsibleState.Collapsed,
-        undefined,
-        undefined,
-        'category'
-      ));
+      for (const server of servers) {
+        const cat = server.category || 'Uncategorized';
+        if (!categories.has(cat)) {
+          categories.set(cat, []);
+        }
+        categories.get(cat)!.push(server);
+      }
+
+      const items: vscode.TreeItem[] = [];
+      for (const [category, catServers] of categories) {
+        items.push(new CategoryTreeItem(
+          category,
+          catServers,
+          vscode.TreeItemCollapsibleState.Collapsed
+        ));
+      }
+
+      return items;
     }
 
-    if (element.contextValue === 'category') {
+    if (element instanceof CategoryTreeItem) {
       // Show servers in this category
-      const servers = await fetchServers(this.context);
       const clients = detectClients();
       const primaryClient = clients.find(c => c.exists);
 
-      const categoryServers = servers.filter(s =>
-        s.categories.includes(element.label)
-      );
-
-      return categoryServers.map(s => new ServerTreeItem(
-        s.name,
+      return element.servers.map(s => new ServerTreeItem(
+        s.title || s.name,
         vscode.TreeItemCollapsibleState.None,
         s,
         primaryClient,
