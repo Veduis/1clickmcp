@@ -1,0 +1,11 @@
+# Changelog
+
+## 1.0.0 (2026-06-05)
+
+- Initial release
+- Support for 8 MCP clients: Claude Desktop, Cursor, Cline, Windsurf, VS Code, Continue.dev, Zed, mcphub.nvim
+- Auto-detection of installed clients
+- One-click server installation
+- Environment variable prompting
+- Server catalog with fallback data
+- Multi-platform support (macOS, Linux, Windows)

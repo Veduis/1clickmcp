@@ -1,0 +1,157 @@
+{
+  "name": "1-click-mcp-installer",
+  "displayName": "1 Click MCP Installer By VePrompts",
+  "description": "Install MCP servers from VePrompts directory with one click. Supports Claude Desktop, Cursor, Cline, Windsurf, VS Code, Continue.dev, Zed, and more.",
+  "version": "1.0.0",
+  "publisher": "veprompts",
+  "author": "VePrompts (https://veprompts.com)",
+  "license": "MIT",
+  "homepage": "https://veprompts.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veprompts/1-click-mcp-installer"
+  },
+  "bugs": {
+    "url": "https://github.com/veprompts/1-click-mcp-installer/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "mcp-installer",
+    "claude",
+    "cursor",
+    "windsurf",
+    "cline",
+    "ai-tools",
+    "veprompts"
+  ],
+  "engines": {
+    "vscode": "^>=1.80.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Snippets",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:veprompts-mcp.openPanel"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "veprompts-mcp.openPanel",
+        "title": "Open MCP Installer",
+        "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.installServer",
+        "title": "Install MCP Server",
+        "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.uninstallServer",
+        "title": "Uninstall MCP Server",
+        "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.searchServers",
+        "title": "Search MCP Servers",
+        "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.copyInstallCommand",
+        "title": "Copy Install Command",
+        "category": "VePrompts"
+      },
+      {
+        "command": "veprompts-mcp.openOnVePrompts",
+        "title": "Open on VePrompts",
+        "category": "VePrompts"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "veprompts-mcp",
+          "title": "MCP Installer",
+          "icon": "$(plug)"
+        }
+      ]
+    },
+    "views": {
+      "veprompts-mcp": [
+        {
+          "id": "veprompts-mcp.servers",
+          "name": "MCP Servers",
+          "when": "true"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "veprompts-mcp.installServer",
+          "when": "view == veprompts-mcp.servers && viewItem == server",
+          "group": "inline"
+        },
+        {
+          "command": "veprompts-mcp.uninstallServer",
+          "when": "view == veprompts-mcp.servers && viewItem == installed",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "VePrompts MCP Installer",
+      "properties": {
+        "veprompts-mcp.preferredClient": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "claude-desktop",
+            "cursor",
+            "cline",
+            "windsurf",
+            "vscode",
+            "continue",
+            "zed",
+            "mcphub-nvim"
+          ],
+          "enumDescriptions": [
+            "Auto-detect from installed clients",
+            "Claude Desktop",
+            "Cursor",
+            "Cline (VS Code extension)",
+            "Windsurf",
+            "VS Code (native MCP)",
+            "Continue.dev",
+            "Zed",
+            "mcphub.nvim (Neovim)"
+          ],
+          "description": "Preferred MCP client for server installation"
+        },
+        "veprompts-mcp.catalogUrl": {
+          "type": "string",
+          "default": "https://veprompts.com/api/mcp-catalog",
+          "description": "URL for the MCP server catalog"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^2.15.0",
+    "typescript": "^5.3.0"
+  }
+}
