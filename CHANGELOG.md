@@ -1,19 +1,27 @@
 # Changelog
 
-## 1.0.3 (2026-06-05)
+## 1.0.4 (2026-06-05)
 
 - fix: Replace incorrect icon with proper VePrompts brand logo (128x128 PNG)
+- fix: Make server tree items clickable — opens server detail page on VePrompts
+- fix: Expand fallback catalog from 3 to 15 servers across more categories
+- fix: Split Open VSX keywords into separate `devin` and `windsurf` tags
 - docs: Rebrand Windsurf to Devin (formerly Windsurf) across all references
 
-## 1.0.2 (2026-06-05)
+## 1.0.3 (2026-06-05)
 
 - fix: Change publisher from `veprompts` to `veduis` to resolve Open VSX unverified publisher warning
 - fix: Add `icon.png` to extension root for Open VSX marketplace display
 - docs: Update author attribution to Veduis
 
-## 1.0.1 (2026-06-05)
+## 1.0.2 (2026-06-05)
 
 - docs: Add live Open VSX Registry link (https://open-vsx.org/extension/Veduis/1-click-mcp-installer)
+- docs: Add Veduis blog launch announcement backlink to README
+
+## 1.0.1 (2026-06-05)
+
+- docs: Add live Open VSX Registry link
 - docs: Add Veduis blog launch announcement backlink to README
 
 ## 1.0.0 (2026-06-05)
@@ -25,8 +33,3 @@
 - Environment variable prompting
 - Server catalog with fallback data
 - Multi-platform support (macOS, Linux, Windows)
-
-## 1.0.3 (2026-06-05)
-
-- fix: Replace incorrect icon with proper VePrompts brand logo (128x128 PNG)
-- docs: Rebrand Windsurf to Devin (formerly Windsurf) across all references
