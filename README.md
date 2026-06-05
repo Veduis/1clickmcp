@@ -45,10 +45,11 @@ Select your target MCP client and enter required environment variables. The serv
 
 ## Installation
 
-1. Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=veprompts.1-click-mcp-installer)
-2. Open the MCP Installer panel from the activity bar
-3. Browse categories or search for servers
-4. Click install on any server
+1. Install from the VS Code Marketplace (coming soon)
+2. Or install manually from the [Open VSX Registry](https://open-vsx.org) (coming soon)
+3. Open the MCP Installer panel from the activity bar
+4. Browse categories or search for servers
+5. Click install on any server
 
 ## Usage
 
@@ -83,6 +84,7 @@ Options: `auto`, `claude-desktop`, `cursor`, `cline`, `windsurf`, `vscode`, `con
 - [VePrompts MCP Directory](https://veprompts.com/mcp/servers/) — Browse all 90+ servers
 - [VePrompts](https://veprompts.com) — AI tools and prompts
 - [Built by Veduis](https://veduis.com) — Digital agency specializing in AI tooling
+- [Launch Announcement](https://veduis.com/blog/veprompts-2-0-mcp-server-directory-launch/) — Read about the VePrompts 2.0 launch on the Veduis blog
 
 ## License
 
