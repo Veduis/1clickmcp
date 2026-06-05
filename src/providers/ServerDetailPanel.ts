@@ -1,20 +1,24 @@
 import * as vscode from 'vscode';
-import { McpServer } from '../types/server';
+import { McpServer, DetectedClient } from '../types/server';
 import { detectClients } from '../config/detector';
 import { readConfig } from '../config/reader';
+import { serverExists } from '../config/writer';
 
 export class ServerDetailPanel {
   public static currentPanel: ServerDetailPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
   private _server: McpServer;
+  private _extensionUri: vscode.Uri;
 
   private constructor(
     panel: vscode.WebviewPanel,
-    server: McpServer
+    server: McpServer,
+    extensionUri: vscode.Uri
   ) {
     this._panel = panel;
     this._server = server;
+    this._extensionUri = extensionUri;
     this._panel.webview.html = this._getHtml();
 
     this._panel.webview.onDidReceiveMessage(
@@ -26,16 +30,20 @@ export class ServerDetailPanel {
             } as any);
             this._updateHtml();
             break;
-          case 'uninstall':
-            const clients = detectClients();
-            const client = clients.find(c => c.exists);
-            if (client) {
-              await vscode.commands.executeCommand('veprompts-mcp.uninstallServer', {
-                server: this._server,
-                client
-              } as any);
-              this._updateHtml();
-            }
+          case 'uninstall': {
+            const success = await vscode.commands.executeCommand('veprompts-mcp.uninstallServer', {
+              server: this._server
+            } as any);
+            // The command returns undefined through executeCommand, but the side effect
+            // is what matters — refresh the panel to show updated state
+            setTimeout(() => this._updateHtml(), 300);
+            break;
+          }
+          case 'configureEnv':
+            await vscode.commands.executeCommand('veprompts-mcp.configureServerEnv', {
+              server: this._server
+            } as any);
+            this._updateHtml();
             break;
           case 'copyConfig':
             await vscode.commands.executeCommand('veprompts-mcp.copyInstallCommand', {
@@ -54,7 +62,7 @@ export class ServerDetailPanel {
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
   }
 
-  public static createOrShow(_extensionUri: vscode.Uri, server: McpServer): void {
+  public static createOrShow(extensionUri: vscode.Uri, server: McpServer): void {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : vscode.ViewColumn.One;
@@ -77,7 +85,11 @@ export class ServerDetailPanel {
       }
     );
 
-    ServerDetailPanel.currentPanel = new ServerDetailPanel(panel, server);
+    ServerDetailPanel.currentPanel = new ServerDetailPanel(panel, server, extensionUri);
+  }
+
+  public refresh(): void {
+    this._updateHtml();
   }
 
   private _escapeHtml(text: string): string {
@@ -93,95 +105,284 @@ export class ServerDetailPanel {
     this._panel.webview.html = this._getHtml();
   }
 
+  private _getInstallStatus(): { isInstalled: boolean; client?: DetectedClient; hasEmptyEnv: boolean } {
+    const clients = detectClients().filter(c => c.exists);
+    for (const client of clients) {
+      const config = readConfig(client.configPath, client.configFormat);
+      const serverConfig = config.mcpServers[this._server.id];
+      if (serverConfig) {
+        const hasEmptyEnv = this._server.envVars && this._server.envVars.length > 0 &&
+          (!serverConfig.env || Object.values(serverConfig.env).some(v => !v || v === ''));
+        return { isInstalled: true, client, hasEmptyEnv };
+      }
+    }
+    return { isInstalled: false, hasEmptyEnv: false };
+  }
+
   private _getHtml(): string {
     const s = this._server;
     const e = this._escapeHtml.bind(this);
-
-    const clients = detectClients();
-    const primaryClient = clients.find(c => c.exists);
-    let isInstalled = false;
-    if (primaryClient) {
-      const config = readConfig(primaryClient.configPath, primaryClient.configFormat);
-      isInstalled = !!config.mcpServers[s.id];
-    }
+    const status = this._getInstallStatus();
 
     const tools = s.tools.map(t => `<li><strong>${e(t.name)}</strong> — ${e(t.description)}</li>`).join('');
     const envVars = s.envVars.map(v =>
-      `<tr><td><code>${e(v.name)}</code></td><td>${e(v.description)}</td><td>${v.required ? '✅' : 'Optional'}</td></tr>`
+      `<tr><td><code>${e(v.name)}</code></td><td>${e(v.description)}</td><td>${v.required ? 'Required' : 'Optional'}</td></tr>`
     ).join('');
     const installMethods = s.installMethods.map(m =>
       `<div class="method"><code>${e(m.command)}</code><span>${e(m.description)}</span></div>`
     ).join('');
 
-    // Ensure vepromptsUrl is valid
     const docsUrl = s.vepromptsUrl || `https://veprompts.com/mcp/servers/${s.id}/`;
+
+    // Determine button state
+    let primaryButton: string;
+    let secondaryButton: string | null = null;
+
+    if (status.isInstalled) {
+      if (status.hasEmptyEnv) {
+        primaryButton = `<button class="btn btn-configure" id="configureBtn">Configure Environment Variables</button>`;
+        secondaryButton = `<button class="btn btn-danger" id="installBtn">Uninstall</button>`;
+      } else {
+        primaryButton = `<button class="btn btn-danger" id="installBtn">Uninstall</button>`;
+      }
+    } else {
+      primaryButton = `<button class="btn btn-primary" id="installBtn">Install</button>`;
+    }
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: var(--vscode-font-family); padding: 20px; color: var(--vscode-foreground); background: var(--vscode-editor-background); }
-    h1 { margin-bottom: 8px; font-size: 22px; }
-    .meta { color: var(--vscode-descriptionForeground); margin-bottom: 20px; font-size: 13px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 8px; font-weight: 600; }
-    .official { background: #2d5016; color: #7ee787; }
-    .featured { background: #1a3a5c; color: #79c0ff; }
-    .installed { background: #166534; color: #86efac; }
-    .section { margin: 24px 0; }
-    .section h2 { font-size: 16px; border-bottom: 1px solid var(--vscode-panel-border); padding-bottom: 8px; margin-bottom: 12px; }
-    code { background: var(--vscode-textCodeBlock-background); padding: 2px 6px; border-radius: 3px; font-size: 13px; font-family: var(--vscode-editor-font-family); }
-    .method { background: var(--vscode-editor-background); border: 1px solid var(--vscode-panel-border); padding: 12px; border-radius: 6px; margin: 8px 0; }
-    .method code { display: block; margin-bottom: 4px; font-family: var(--vscode-editor-font-family); word-break: break-all; }
-    .method span { color: var(--vscode-descriptionForeground); font-size: 12px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--vscode-panel-border); }
-    th { font-weight: 600; }
-    .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--vscode-panel-border); text-align: center; }
-    .footer a { color: var(--vscode-textLink-foreground); text-decoration: none; }
+    :root {
+      --bg: var(--vscode-editor-background);
+      --fg: var(--vscode-foreground);
+      --fg-secondary: var(--vscode-descriptionForeground);
+      --border: var(--vscode-panel-border);
+      --link: var(--vscode-textLink-foreground);
+      --code-bg: var(--vscode-textCodeBlock-background);
+      --font: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      --font-mono: var(--vscode-editor-font-family, 'SF Mono', Monaco, 'Cascadia Code', monospace);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--fg);
+      background: var(--bg);
+      padding: 24px 28px;
+      max-width: 720px;
+    }
+
+    /* Header */
+    .header { margin-bottom: 20px; }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--fg-secondary);
+    }
+    .meta a { color: var(--link); text-decoration: none; }
+    .meta a:hover { text-decoration: underline; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .badge-official { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
+    .badge-featured { background: rgba(56, 139, 253, 0.15); color: #58a6ff; }
+    .badge-installed { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
+    .badge-needs-config { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+
+    /* Description */
+    .description {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--fg);
+      margin-bottom: 20px;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:active { opacity: 0.7; }
+    .btn-primary { background: #0969da; color: #fff; }
+    .btn-danger { background: #cf222e; color: #fff; }
+    .btn-configure { background: #9a6700; color: #fff; }
+    .btn-secondary {
+      background: var(--code-bg);
+      color: var(--fg);
+      border-color: var(--border);
+    }
+
+    /* Docs link */
+    .docs-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--link);
+      text-decoration: none;
+      margin-bottom: 24px;
+    }
+    .docs-link:hover { text-decoration: underline; }
+
+    /* Sections */
+    .section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--fg-secondary);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Install methods */
+    .method {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .method code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      word-break: break-all;
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+    .method span {
+      font-size: 11px;
+      color: var(--fg-secondary);
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: var(--fg-secondary);
+    }
+    td code {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* Lists */
+    ul { list-style: none; }
+    ul li {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    ul li:last-child { border-bottom: none; }
+    ul li strong { font-weight: 600; }
+
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 11px;
+      color: var(--fg-secondary);
+    }
+    .footer a { color: var(--link); text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
-    .actions { margin: 20px 0; display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-primary { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-primary:hover { background: #5558e0; }
-    .btn-secondary { padding: 10px 20px; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-panel-border); border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-secondary:hover { background: var(--vscode-button-hoverBackground); }
-    .btn-danger { padding: 10px 20px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-danger:hover { background: #b91c1c; }
-    .one-click { display: inline-flex; align-items: center; gap: 6px; background: #166534; color: #86efac; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
-    .docs-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 8px 16px; background: var(--vscode-button-secondaryBackground); border: 1px solid var(--vscode-panel-border); border-radius: 6px; color: var(--vscode-textLink-foreground); text-decoration: none; font-size: 13px; font-weight: 500; }
-    .docs-link:hover { background: var(--vscode-button-hoverBackground); }
   </style>
 </head>
 <body>
-  <h1>${e(s.title || s.name)}</h1>
-  <div class="meta">
-    ${s.official ? '<span class="badge official">Official</span>' : ''}
-    ${s.featured ? '<span class="badge featured">Featured</span>' : ''}
-    ${isInstalled ? '<span class="badge installed">✓ Installed</span>' : ''}
-    ⭐ ${(s.stars || 0).toLocaleString()} | ${e(s.language || 'TypeScript')} | ${e(s.license || 'MIT')} | By <a href="#" onclick="openExternal('${e(s.authorUrl || s.repoUrl || s.githubUrl)}')">${e(s.author || 'Unknown')}</a>
-    ${s.envVars.length === 0 ? '<span class="one-click">⚡ 1-Click Install</span>' : ''}
+  <div class="header">
+    <h1>${e(s.title || s.name)}</h1>
+    <div class="meta">
+      ${s.official ? '<span class="badge badge-official">Official</span>' : ''}
+      ${s.featured ? '<span class="badge badge-featured">Featured</span>' : ''}
+      ${status.isInstalled ? (status.hasEmptyEnv ? '<span class="badge badge-needs-config">Installed — needs config</span>' : '<span class="badge badge-installed">Installed</span>') : ''}
+      <span>⭐ ${(s.stars || 0).toLocaleString()}</span>
+      <span>·</span>
+      <span>${e(s.language || 'TypeScript')}</span>
+      <span>·</span>
+      <span>${e(s.license || 'MIT')}</span>
+      <span>·</span>
+      <span>By <a href="#" onclick="openExternal('${e(s.authorUrl || s.repoUrl || s.githubUrl)}')">${e(s.author || 'Unknown')}</a></span>
+    </div>
   </div>
 
-  <p>${e(s.description)}</p>
+  <p class="description">${e(s.description)}</p>
 
   <div class="actions">
-    ${isInstalled
-      ? '<button class="btn-danger" id="installBtn">🗑 Uninstall</button>'
-      : '<button class="btn-primary" id="installBtn">⚡ Install into MCP Client</button>'
-    }
-    <button class="btn-secondary" id="copyBtn">📋 Copy Config</button>
+    ${primaryButton}
+    ${secondaryButton || ''}
+    <button class="btn btn-secondary" id="copyBtn">Copy Config</button>
   </div>
 
-  <a href="#" class="docs-link" onclick="openExternal('${e(docsUrl)}')">📖 View Full Documentation on VePrompts</a>
+  <a href="#" class="docs-link" onclick="openExternal('${e(docsUrl)}')">View full documentation on VePrompts →</a>
 
   <div class="section">
-    <h2>Install Methods</h2>
+    <div class="section-title">Install Methods</div>
     ${installMethods || `<div class="method"><code>${e(s.command)} ${e(s.args.join(' '))}</code><span>Default install command</span></div>`}
   </div>
 
   ${s.envVars.length > 0 ? `
   <div class="section">
-    <h2>Environment Variables</h2>
+    <div class="section-title">Environment Variables</div>
     <table>
       <tr><th>Name</th><th>Description</th><th>Required</th></tr>
       ${envVars}
@@ -191,31 +392,42 @@ export class ServerDetailPanel {
 
   ${s.tools.length > 0 ? `
   <div class="section">
-    <h2>Tools (${s.tools.length})</h2>
+    <div class="section-title">Tools (${s.tools.length})</div>
     <ul>${tools}</ul>
   </div>
   ` : ''}
 
   <div class="section">
-    <h2>Compatibility</h2>
-    <p>Clients: ${e(s.compatibility.clients.join(', ') || 'All major clients')}</p>
-    <p>Transport: ${e(s.compatibility.transport.join(', ') || 'stdio')}</p>
+    <div class="section-title">Compatibility</div>
+    <p style="font-size:12px;margin-bottom:4px;"><strong>Clients:</strong> ${e(s.compatibility.clients.join(', ') || 'All major clients')}</p>
+    <p style="font-size:12px;"><strong>Transport:</strong> ${e(s.compatibility.transport.join(', ') || 'stdio')}</p>
   </div>
 
   <div class="footer">
-    <p style="font-size: 12px; color: var(--vscode-descriptionForeground);">
-      Powered by <a href="#" onclick="openExternal('https://veprompts.com')">VePrompts</a> — The #1 free MCP server directory
-    </p>
+    <p>Powered by <a href="#" onclick="openExternal('https://veprompts.com')">VePrompts</a> — The #1 free MCP server directory</p>
   </div>
 
   <script>
     const vscode = acquireVsCodeApi();
-    document.getElementById('installBtn').addEventListener('click', () => {
-      vscode.postMessage({ command: ${isInstalled ? '"uninstall"' : '"install"'} });
-    });
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      vscode.postMessage({ command: 'copyConfig' });
-    });
+    const installBtn = document.getElementById('installBtn');
+    const configureBtn = document.getElementById('configureBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    if (installBtn) {
+      installBtn.addEventListener('click', () => {
+        vscode.postMessage({ command: ${status.isInstalled ? '"uninstall"' : '"install"'} });
+      });
+    }
+    if (configureBtn) {
+      configureBtn.addEventListener('click', () => {
+        vscode.postMessage({ command: 'configureEnv' });
+      });
+    }
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        vscode.postMessage({ command: 'copyConfig' });
+      });
+    }
     function openExternal(url) {
       vscode.postMessage({ command: 'openExternal', url });
     }

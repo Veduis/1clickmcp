@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 (2026-06-05)
+
+- feat: **Redesigned server detail panel** — clean, modern UI with proper typography, restrained colors, and clear hierarchy. No more vibe-coded gradients and emojis
+- feat: **Uninstall now works reliably** — detects which client(s) have the server installed, shows picker if multiple, verifies file was actually removed, shows clear success/error messages
+- feat: **Detail panel refreshes after install/uninstall** — button state updates immediately without closing the panel
+- feat: **"Configure Environment Variables" button in detail panel** — appears on installed servers that need env vars, right next to Uninstall
+- feat: **Install status badges in detail panel** — shows "Installed", "Installed — needs config", or no badge
+- fix: Uninstall confirmation is now modal with explanatory detail text
+- fix: Webview uninstall checks ALL detected clients, not just the first one
+- fix: Tree view refreshes + detail panel refreshes on every install/uninstall action
+
 ## 1.2.0 (2026-06-05)
 
 - feat: **Deferred environment variable configuration** — servers install immediately without blocking on env var prompts. Users configure env vars later via right-click "Configure Environment Variables"

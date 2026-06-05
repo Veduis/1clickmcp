@@ -4,6 +4,7 @@ import { detectClients, getAllPossiblePaths } from '../config/detector';
 import { addServer, serverExists, removeServer } from '../config/writer';
 import { promptForEnvVars } from '../utils/envPrompt';
 import { validateServerConfig, sanitizeServerId } from '../utils/validator';
+import { ServerDetailPanel } from '../providers/ServerDetailPanel';
 
 export async function installServer(
   context: vscode.ExtensionContext,
@@ -173,6 +174,10 @@ export async function installServer(
         vscode.env.openExternal(vscode.Uri.parse(`https://veprompts.com/mcp/servers/${server.id}/`));
       } else if (action === 'Configure Env Vars') {
         vscode.commands.executeCommand('veprompts-mcp.configureServerEnv', server, targetClient);
+      }
+      // Refresh detail panel if open
+      if (ServerDetailPanel.currentPanel) {
+        ServerDetailPanel.currentPanel.refresh();
       }
     });
   } catch (err) {

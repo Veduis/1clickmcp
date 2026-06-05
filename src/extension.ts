@@ -43,9 +43,15 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('veprompts-mcp.uninstallServer', async (item: ServerTreeItem) => {
-      if (item.server && item.client) {
-        await uninstallServer(context, item.server.id, item.client);
-        treeProvider.refresh();
+      if (item.server) {
+        const success = await uninstallServer(context, item.server.id, item.client);
+        if (success) {
+          treeProvider.refresh();
+          // Also refresh detail panel if open
+          if (ServerDetailPanel.currentPanel) {
+            ServerDetailPanel.currentPanel.refresh();
+          }
+        }
       }
     })
   );
