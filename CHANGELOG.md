@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 (2026-06-05)
+
+- fix: Replace incorrect icon with proper VePrompts brand logo (128x128 PNG)
+- docs: Rebrand Windsurf to Devin (formerly Windsurf) across all references
+
 ## 1.0.2 (2026-06-05)
 
 - fix: Change publisher from `veprompts` to `veduis` to resolve Open VSX unverified publisher warning
@@ -14,9 +19,14 @@
 ## 1.0.0 (2026-06-05)
 
 - Initial release
-- Support for 8 MCP clients: Claude Desktop, Cursor, Cline, Windsurf, VS Code, Continue.dev, Zed, mcphub.nvim
+- Support for 8 MCP clients: Claude Desktop, Cursor, Cline, Devin (formerly Windsurf), VS Code, Continue.dev, Zed, mcphub.nvim
 - Auto-detection of installed clients
 - One-click server installation
 - Environment variable prompting
 - Server catalog with fallback data
 - Multi-platform support (macOS, Linux, Windows)
+
+## 1.0.3 (2026-06-05)
+
+- fix: Replace incorrect icon with proper VePrompts brand logo (128x128 PNG)
+- docs: Rebrand Windsurf to Devin (formerly Windsurf) across all references

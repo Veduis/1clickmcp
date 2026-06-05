@@ -29,7 +29,7 @@ Select your target MCP client and enter required environment variables. The serv
 | Claude Desktop | macOS, Windows, Linux | `~/Library/Application Support/Claude/claude_desktop_config.json` |
 | Cursor | Universal | `~/.cursor/mcp.json` |
 | Cline | macOS, Windows, Linux | `~/Library/Application Support/Code/.../cline_mcp_settings.json` |
-| Windsurf | Universal | `~/.codeium/windsurf/mcp_config.json` |
+| Devin (formerly Windsurf) | Universal | `~/.codeium/devin (formerly windsurf)/mcp_config.json` |
 | VS Code (native MCP) | macOS, Windows, Linux | `~/Library/Application Support/Code/User/mcp.json` |
 | Continue.dev | Universal | `~/.continue/config.json` |
 | Zed | macOS, Linux | `~/.config/zed/settings.json` |
@@ -77,7 +77,7 @@ Set your default MCP client in VS Code settings:
 }
 ```
 
-Options: `auto`, `claude-desktop`, `cursor`, `cline`, `windsurf`, `vscode`, `continue`, `zed`, `mcphub-nvim`
+Options: `auto`, `claude-desktop`, `cursor`, `cline`, `devin (formerly windsurf)`, `vscode`, `continue`, `zed`, `mcphub-nvim`
 
 ## Links
 

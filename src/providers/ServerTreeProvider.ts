@@ -19,6 +19,13 @@ export class ServerTreeItem extends vscode.TreeItem {
       this.tooltip = `${server.name}\n${server.description}\nCommand: ${server.command} ${server.args?.join(' ') || ''}`;
       this.description = server.categories.slice(0, 2).join(', ');
 
+      // Make server items clickable — open on VePrompts
+      this.command = {
+        command: 'veprompts-mcp.openOnVePrompts',
+        title: 'Open Server Details',
+        arguments: [this]
+      };
+
       if (client) {
         const config = readConfig(client.configPath, client.configFormat);
         const isInstalled = !!config.mcpServers[server.id];

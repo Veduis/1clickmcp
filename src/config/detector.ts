@@ -97,14 +97,14 @@ export function detectClients(): DetectedClient[] {
     }
   }
 
-  // Windsurf
-  const windsurfPath = path.join(home, '.codeium', 'windsurf', 'mcp_config.json');
-  if (fs.existsSync(windsurfPath)) {
+  // Devin (formerly Windsurf)
+  const devinPath = path.join(home, '.codeium', 'devin', 'mcp_config.json');
+  if (fs.existsSync(devinPath)) {
     clients.push({
-      id: 'windsurf',
-      name: 'windsurf',
-      displayName: 'Windsurf',
-      configPath: windsurfPath,
+      id: 'devin',
+      name: 'devin',
+      displayName: 'Devin (formerly Windsurf)',
+      configPath: devinPath,
       exists: true,
       platform: 'universal',
       configFormat: 'cursor'
@@ -218,8 +218,8 @@ export function getAllPossiblePaths(): string[] {
     paths.push(path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'mcp_settings.json'));
   }
 
-  // Windsurf
-  paths.push(path.join(home, '.codeium', 'windsurf', 'mcp_config.json'));
+  // Devin (formerly Windsurf)
+  paths.push(path.join(home, '.codeium', 'devin', 'mcp_config.json'));
 
   // VS Code
   if (platform === 'macos') {

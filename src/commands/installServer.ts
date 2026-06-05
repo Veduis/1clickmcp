@@ -19,7 +19,7 @@ export async function installServer(
 
   if (activeClients.length === 0) {
     const action = await vscode.window.showWarningMessage(
-      'No MCP clients detected. Install one first: Claude Desktop, Cursor, Cline, Windsurf, VS Code, Continue.dev, Zed, or mcphub.nvim',
+      'No MCP clients detected. Install one first: Claude Desktop, Cursor, Cline, Devin (formerly Windsurf), VS Code, Continue.dev, Zed, or mcphub.nvim',
       'Open VePrompts',
       'Cancel'
     );
