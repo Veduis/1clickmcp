@@ -37,7 +37,7 @@ Select your target MCP client and enter required environment variables. The serv
 
 ## Features
 
-- **One-click install** — Browse 90+ MCP servers and install to any supported client
+- **One-click install** — Browse 500+ MCP servers and install to any supported client
 - **Auto-detect clients** — Automatically finds installed MCP clients on your system
 - **Environment variable prompts** — Securely enter API keys during installation
 - **Multi-client support** — Install the same server to multiple clients
@@ -81,7 +81,7 @@ Options: `auto`, `claude-desktop`, `cursor`, `cline`, `devin (formerly windsurf)
 
 ## Links
 
-- [VePrompts MCP Directory](https://veprompts.com/mcp/servers/) — Browse all 90+ servers
+- [VePrompts MCP Directory](https://veprompts.com/mcp/servers/) — Browse all 500+ servers
 - [VePrompts](https://veprompts.com) — AI tools and prompts
 - [Built by Veduis](https://veduis.com) — Digital agency specializing in AI tooling
 - [Launch Announcement](https://veduis.com/blog/veprompts-2-0-mcp-server-directory-launch/) — Read about the VePrompts 2.0 launch on the Veduis blog

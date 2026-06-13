@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 (2026-06-13)
+
+- feat: **Expanded catalog to 541 MCP servers** (was ~91) — 6x increase in available servers
+- feat: **Live star counts** — all 541 servers now show real GitHub star counts from the VePrompts API (185,822 total stars across catalog)
+- feat: **11 categories** — developer-tools, browser-automation, cloud-platforms, databases, productivity, finance, commerce, AI infrastructure, search, and more
+- feat: **28 official servers, 21 featured servers** — curated and verified by VePrompts
+- fix: **Updated all server count references** — README, package description, and welcome message now show "500+" instead of outdated counts
+- fix: **Verified vepromptsUrl links** — all 541 servers link correctly to `https://veprompts.com/mcp/servers/{slug}/`
+
 ## 1.4.0 (2026-06-05)
 
 - feat: **Sidebar search** — search icon in the tree view title bar lets users filter servers by name, category, tag, or author. Results appear directly in the sidebar

@@ -139,7 +139,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const hasShownWelcome = context.globalState.get<boolean>('veprompts-mcp.welcomeShown');
   if (!hasShownWelcome) {
     vscode.window.showInformationMessage(
-      '🚀 VePrompts MCP Installer is ready. Browse 90+ MCP servers and install with one click.',
+      '🚀 VePrompts MCP Installer is ready. Browse 500+ MCP servers and install with one click.',
       'Browse Servers',
       'Dismiss'
     ).then(action => {
